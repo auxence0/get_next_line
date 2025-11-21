@@ -6,137 +6,146 @@
 /*   By: asauvage <asauvage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/20 14:04:19 by asauvage          #+#    #+#             */
-/*   Updated: 2025/11/20 18:24:54 by asauvage         ###   ########.fr       */
+/*   Updated: 2025/11/21 16:53:33 by asauvage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <fcntl.h>
-#include <unistd.h>
 #include "get_next_line.h"
 
-t_line	*new_node(char *content)
+int	ft_strlen(char *str)
 {
-	t_line	*new_node;
+	int	i;
 
-	new_node = malloc(sizeof(t_line));
-	if (new_node == NULL)
-		return (0);
-	new_node->content = content;
-	new_node->next = NULL;
-	new_node->previous = NULL;
-	return (new_node);
+	i = 0;
+	while (str && str[i])
+		i++;
+	return (i);
 }
 
-/* char	*line_to_print(t_line	*node)
+char	*clear(char *str)
 {
 	char	*res;
-	int		size;
-	int		i_node;
-	int		i_res;
-
-	size = 0;
-	i_node = 0;
-	while (node != NULL)
-	{
-		while (node->content[i_node] && node->content[i_node] != '\n')
-		{
-			i_node++;
-			size++;
-			if (node->next == NULL && node->content[i_node] == '\n')
-				continue;
-		}
-		if (node->content[i_node] == '\n')
-			break;
-		i_node = 0;
-		node = node->previous;
-	}
-	res = malloc(sizeof(char) * (size + 1));
-	if (res == NULL)
-		return (0);
-	i_node = 0;
-	i_res = 0;
-	while (node != NULL)
-	{
-		while (node->content[i_node])
-		{
-			res[i_res++] = node->content[i_node++];
-			if (node->content[i_node] == '\n')
-			{
-				res[i_res] = '\n';
-				return (res);
-			}
-		}
-		i_node = 0;
-		node = node->next;
-	}
-	return (res);
-} */
-
-char	*line_to_print(t_line *node)
-{
-	char	*res;
-	int		size;
 	int		i;
 	int		j;
-	int		nb_nw_line;
 
-	nb_nw_line = 0;
-	size = 0;
-	i = 0;
-	node = node->previous;
-	while (node != NULL && nb_nw_line != 2)
-	{
-		while (node->content[i])
-		{
-			if (node->content[i] == '\n')
-				nb_nw_line++;
-			i++;
-			size++;
-		}
-		i = 0;
-		node = node->previous;
-	}
 	j = 0;
-	res = malloc(sizeof(char) * size);
-	while (node->content[i] != '\n')
+	i = 0;
+	if (!str)
+		return (0);
+	while (str[i] != '\n')
 		i++;
-	while (node->content[i] != '\n' && node != NULL)
-		res[j++] = node->content[i++];
+	res = malloc(ft_strlen(str) - i);
+	if (res == NULL)
+		return (0);
+	while (str[i])
+		res[j++] = str[i++];
+	res[j] = '\0';
+	free(str);
 	return (res);
 }
+
+char	*result_line(char *str)
+{
+	int		i;
+	char	*res;
+
+	i = 0;
+	if (!str)
+		return (0);
+	while (str[i] && str[i] != '\n')
+		i++;
+	res = malloc(sizeof(char) * (i + 1));
+	if (res == NULL)
+		return (0);
+	i = 0;
+	while (str[i] && str[i] != '\n')
+	{
+		res[i] = str[i];
+		i++;
+	}
+	if (str[i] == '\n')
+		res[i++] = '\n';
+	res[i] = '\0';
+	return (res);
+}
+
+char	*ft_strcat(char *dst, char *src)
+{
+	char	*res;
+	int		len;
+	int		i;
+	int		j;
+
+	j = 0;
+	i = 0;
+	len = ft_strlen(dst) + ft_strlen(src) + 1;
+	res = malloc(sizeof(char) * len);
+	if ((res == NULL) || (dst == NULL && src == NULL))
+		return (0);
+	while (dst != NULL && dst[j])
+		res[i++] = dst[j++];
+	j = 0;
+	while (src != NULL && src[j])
+		res[i++] = src[j++];
+	res[i] = '\0';
+	free(dst);
+	return (res);
+}
+
+int	ft_strchr(char *str, char c)
+{
+	int	i;
+
+	i = 0;
+	while (str && str[i])
+	{
+		if (str[i] == (char)c)
+			return (1);
+		i++;
+	}
+	return (0);
+}
+
 char	*get_next_line(int fd)
 {
-	char		*tmp;
-	char		*res;
-	int			b;
-	t_line		*node;
-	t_line		*tmp_node;
+	char		*buffer;
+	static char	*stash;
+	char		*result;
+	int			n_bytes;
+	int			i;
 
-	tmp = malloc(sizeof(char) * BUFFER_SIZE);
-	if (tmp == NULL)
+	i = 0;
+	if (fd < 0 || BUFFER_SIZE < 0)
 		return (0);
-	b = read(fd, tmp, BUFFER_SIZE);
-	node = new_node(tmp);
-	while (b == BUFFER_SIZE && verif(tmp))
+	buffer = malloc(sizeof(char) * BUFFER_SIZE);
+	if (buffer == NULL)
+		return (0);
+	n_bytes = 1;
+	while (n_bytes > 0 && ft_strchr(buffer, '\n') != 1)
 	{
-		b = read(fd, tmp, BUFFER_SIZE);
-		if (b == -1)
+		n_bytes = read(fd, buffer, BUFFER_SIZE);
+		if (n_bytes == -1)
 			return (0);
-		tmp_node = new_node(tmp);
-		node->next = tmp_node;
-		tmp_node->previous = node;
-		node = node->next;
+		buffer[n_bytes] = '\0';
+		stash = ft_strcat(stash, buffer);
+		if (stash[i++] == '\0')
+			return (0);
 	}
-	res = line_to_print(node);
-	return (res);
+	result = result_line(stash);
+	stash = clear(stash);
+	return (result);
 }
 
 int	main(void)
 {
-	char	*res;
+	char *res;
+	int fd;
 
-	printf("%d", BUFFER_SIZE);
-	res = get_next_line(open("test.txt", O_RDONLY));
-	//printf("%s", res);
+	fd = open("test.txt", O_RDONLY);
+	while ((res = get_next_line(fd)) != NULL)
+	{
+		printf("%s", res);
+		free(res);
+	}
+	close(fd);
 }

@@ -1,12 +1,4 @@
-test de la conftion get
-
-next 
-line
-
-ilya 
-
-plrs sauter
-de ligne
-
-ok
-.
+test simple
+ligne
+suivante
+42
