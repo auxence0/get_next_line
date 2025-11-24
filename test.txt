@@ -1,4 +1,0 @@
-test simple
-ligne
-suivante
-42

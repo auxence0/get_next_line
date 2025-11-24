@@ -6,136 +6,121 @@
 /*   By: asauvage <asauvage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/20 14:04:19 by asauvage          #+#    #+#             */
-/*   Updated: 2025/11/21 16:53:33 by asauvage         ###   ########.fr       */
+/*   Updated: 2025/11/24 17:15:41 by asauvage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int	ft_strlen(char *str)
-{
-	int	i;
-
-	i = 0;
-	while (str && str[i])
-		i++;
-	return (i);
-}
-
-char	*clear(char *str)
-{
-	char	*res;
-	int		i;
-	int		j;
-
-	j = 0;
-	i = 0;
-	if (!str)
-		return (0);
-	while (str[i] != '\n')
-		i++;
-	res = malloc(ft_strlen(str) - i);
-	if (res == NULL)
-		return (0);
-	while (str[i])
-		res[j++] = str[i++];
-	res[j] = '\0';
-	free(str);
-	return (res);
-}
-
-char	*result_line(char *str)
+char	*result_line(char *stash)
 {
 	int		i;
 	char	*res;
 
-	i = 0;
-	if (!str)
+	if (!stash || stash[0] == '\0')
 		return (0);
-	while (str[i] && str[i] != '\n')
+	i = 0;
+	while (stash[i] && stash[i] != '\n')
 		i++;
-	res = malloc(sizeof(char) * (i + 1));
-	if (res == NULL)
+	res = malloc(sizeof(char) * (i + (stash[i] == '\n') + 1));
+	if (!res)
 		return (0);
 	i = 0;
-	while (str[i] && str[i] != '\n')
+	while (stash[i] && stash[i] != '\n')
 	{
-		res[i] = str[i];
+		res[i] = stash[i];
 		i++;
 	}
-	if (str[i] == '\n')
+	if (stash[i] == '\n')
 		res[i++] = '\n';
 	res[i] = '\0';
 	return (res);
 }
 
-char	*ft_strcat(char *dst, char *src)
+char	*clean_stash(char *stash)
 {
-	char	*res;
-	int		len;
+	char	*new_stash;
 	int		i;
-	int		j;
+	int		i_res;
 
-	j = 0;
 	i = 0;
-	len = ft_strlen(dst) + ft_strlen(src) + 1;
-	res = malloc(sizeof(char) * len);
-	if ((res == NULL) || (dst == NULL && src == NULL))
+	if (!stash)
 		return (0);
-	while (dst != NULL && dst[j])
-		res[i++] = dst[j++];
-	j = 0;
-	while (src != NULL && src[j])
-		res[i++] = src[j++];
-	res[i] = '\0';
-	free(dst);
-	return (res);
+	while (stash[i] && stash[i] != '\n')
+		i++;
+	if (stash[i] == '\0')
+	{
+		free(stash);
+		return (0);
+	}
+	i++;
+	new_stash = malloc(sizeof(char) * (ft_strlen(stash) - i + 1));
+	if (!new_stash)
+		return (0);
+	i_res = 0;
+	while (stash[i])
+		new_stash[i_res++] = stash[i++];
+	new_stash[i_res] = '\0';
+	free(stash);
+	return (new_stash);
 }
 
-int	ft_strchr(char *str, char c)
+char	*ft_join(char *stash, char *buff)
 {
-	int	i;
+	int		i;
+	int		j;
+	char	*res;
 
+	if (!stash && !buff)
+		return (0);
+	res = malloc(sizeof(char) * (ft_strlen(stash) + ft_strlen(buff) + 1));
 	i = 0;
-	while (str && str[i])
-	{
-		if (str[i] == (char)c)
-			return (1);
-		i++;
-	}
-	return (0);
+	j = 0;
+	while (stash && stash[i])
+		res[j++] = stash[i++];
+	i = 0;
+	while (buff && buff[i])
+		res[j++] = buff[i++];
+	res[j] = '\0';
+	free(stash);
+	return (res);
 }
 
 char	*get_next_line(int fd)
 {
-	char		*buffer;
 	static char	*stash;
-	char		*result;
-	int			n_bytes;
-	int			i;
+	char		*buff;
+	char		*res;
+	int			bytes;
 
-	i = 0;
-	if (fd < 0 || BUFFER_SIZE < 0)
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (0);
-	buffer = malloc(sizeof(char) * BUFFER_SIZE);
-	if (buffer == NULL)
+	buff = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if (!buff)
 		return (0);
-	n_bytes = 1;
-	while (n_bytes > 0 && ft_strchr(buffer, '\n') != 1)
+	bytes = 1;
+	while (bytes > 0 && (!stash || find_n(stash) == 1))
 	{
-		n_bytes = read(fd, buffer, BUFFER_SIZE);
-		if (n_bytes == -1)
+		bytes = read(fd, buff, BUFFER_SIZE);
+		if (bytes == -1)
+		{
+			free(buff);
 			return (0);
-		buffer[n_bytes] = '\0';
-		stash = ft_strcat(stash, buffer);
-		if (stash[i++] == '\0')
+		}
+		buff[bytes] = '\0';
+		stash = ft_join(stash, buff);
+		if (!stash)
+		{
+			free(buff);
 			return (0);
+		}
 	}
-	result = result_line(stash);
-	stash = clear(stash);
-	return (result);
+	free(buff);
+	res = result_line(stash);
+	stash = clean_stash(stash);
+	return (res);
 }
-
+/*
 int	main(void)
 {
 	char *res;
@@ -148,4 +133,4 @@ int	main(void)
 		free(res);
 	}
 	close(fd);
-}
+} */
