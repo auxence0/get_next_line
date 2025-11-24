@@ -35,3 +35,16 @@ int	find_n(char *str)
 	}
 	return (1);
 }
+
+int	start_index(char *stash, int i)
+{
+	while (stash[i] && stash[i] != '\n')
+		i++;
+	if (stash[i] == '\0')
+	{
+		free(stash);
+		return (0);
+	}
+	i++;
+	return (i);
+}

@@ -23,18 +23,13 @@
 # include <stdlib.h>
 # include <unistd.h>
 
-/* 	typedef struct s_line
-	{
-		char			*content;
-		struct s_line	*next;
-		struct s_line	*previous;
-	}					t_line; */
-
 int		ft_strlen(char *str);
 char	*clean_stash(char *stash);
 char	*result_line(char *stash);
-char	*ft_strcat(char *stash, char *buff);
+char	*ft_join(char *stash, char *buff);
 int		find_n(char *str);
+char	*search_line(int fd, char *buff, char *stash, int bytes);
 char	*get_next_line(int fd);
+int		start_index(char *stash, int i);
 
 #endif

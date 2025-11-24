@@ -37,6 +37,33 @@ char	*result_line(char *stash)
 	return (res);
 }
 
+char	*ft_join(char *stash, char *buff)
+{
+	int		i;
+	int		j;
+	char	*res;
+
+	if (!buff)
+		return (0);
+	res = malloc(sizeof(char) * (ft_strlen(stash) + ft_strlen(buff) + 1));
+	if (!res)
+	{
+		free(stash);
+		return (0);
+	}
+	i = 0;
+	j = 0;
+	while (stash && stash[i])
+		res[j++] = stash[i++];
+	i = 0;
+	while (buff && buff[i])
+		res[j++] = buff[i++];
+	res[j] = '\0';
+	if (stash)
+		free(stash);
+	return (res);
+}
+
 char	*clean_stash(char *stash)
 {
 	char	*new_stash;
@@ -48,15 +75,15 @@ char	*clean_stash(char *stash)
 		return (0);
 	while (stash[i] && stash[i] != '\n')
 		i++;
-	if (stash[i] == '\0')
+	i = start_index(stash, i);
+	if (i == 0)
+		return (0);
+	new_stash = malloc(sizeof(char) * (ft_strlen(stash) - i + 1));
+	if (!new_stash)
 	{
 		free(stash);
 		return (0);
 	}
-	i++;
-	new_stash = malloc(sizeof(char) * (ft_strlen(stash) - i + 1));
-	if (!new_stash)
-		return (0);
 	i_res = 0;
 	while (stash[i])
 		new_stash[i_res++] = stash[i++];
@@ -65,25 +92,29 @@ char	*clean_stash(char *stash)
 	return (new_stash);
 }
 
-char	*ft_join(char *stash, char *buff)
+char	*search_line(int fd, char *buff, char *stash, int bytes)
 {
-	int		i;
-	int		j;
-	char	*res;
-
-	if (!stash && !buff)
-		return (0);
-	res = malloc(sizeof(char) * (ft_strlen(stash) + ft_strlen(buff) + 1));
-	i = 0;
-	j = 0;
-	while (stash && stash[i])
-		res[j++] = stash[i++];
-	i = 0;
-	while (buff && buff[i])
-		res[j++] = buff[i++];
-	res[j] = '\0';
-	free(stash);
-	return (res);
+	while (bytes > 0 && (!stash || find_n(stash) == 1))
+	{
+		bytes = read(fd, buff, BUFFER_SIZE);
+		if (bytes == -1)
+		{
+			free(buff);
+			if (stash)
+				free(stash);
+			return (0);
+		}
+		if (buff)
+			buff[bytes] = '\0';
+		stash = ft_join(stash, buff);
+		if (!stash)
+		{
+			free (buff);
+			return (0);
+		}
+	}
+	free(buff);
+	return (stash);
 }
 
 char	*get_next_line(int fd)
@@ -99,23 +130,7 @@ char	*get_next_line(int fd)
 	if (!buff)
 		return (0);
 	bytes = 1;
-	while (bytes > 0 && (!stash || find_n(stash) == 1))
-	{
-		bytes = read(fd, buff, BUFFER_SIZE);
-		if (bytes == -1)
-		{
-			free(buff);
-			return (0);
-		}
-		buff[bytes] = '\0';
-		stash = ft_join(stash, buff);
-		if (!stash)
-		{
-			free(buff);
-			return (0);
-		}
-	}
-	free(buff);
+	stash = search_line(fd, buff, stash, bytes);
 	res = result_line(stash);
 	stash = clean_stash(stash);
 	return (res);
