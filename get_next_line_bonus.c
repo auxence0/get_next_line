@@ -6,7 +6,7 @@
 /*   By: asauvage <asauvage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/25 10:40:32 by asauvage          #+#    #+#             */
-/*   Updated: 2025/11/25 10:46:17 by asauvage         ###   ########.fr       */
+/*   Updated: 2025/11/25 13:43:02 by asauvage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,34 +116,32 @@ char	*search_line(int fd, char *buff, char *stash, ssize_t bytes)
 
 char	*get_next_line(int fd)
 {
-	static char	*stash;
+	static char	*stash[FD_MAX];
 	char		*buff;
 	char		*res;
 	ssize_t		bytes;
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || fd > FD_MAX || BUFFER_SIZE <= 0)
 		return (0);
 	buff = malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!buff)
 		return (0);
 	bytes = 1;
-	stash = search_line(fd, buff, stash, bytes);
-	res = result_line(stash);
-	stash = clean_stash(stash);
+	stash[fd] = search_line(fd, buff, stash[fd], bytes);
+	res = result_line(stash[fd]);
+	stash[fd] = clean_stash(stash[fd]);
 	return (res);
 }
-/*
+/* 
 int	main(void)
 {
-	char *res;
-	int fd;
-
+		int fd;
+	int	fd2;
+	
 	fd = open("test.txt", O_RDONLY);
-	while ((res = get_next_line(fd)) != NULL)
-	{
-		printf("%s", res);
-		free(res);
-	}
-	printf("\n%s", res);
-	close(fd);
+	fd2 = open("test2.txt", O_RDONLY);
+	printf("%s", get_next_line(fd));
+	printf("%s", get_next_line(fd2));
+	printf("%s", get_next_line(fd));
+	printf("%s", get_next_line(fd2));
 } */

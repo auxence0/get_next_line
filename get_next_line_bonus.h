@@ -6,7 +6,7 @@
 /*   By: asauvage <asauvage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/25 10:44:25 by asauvage          #+#    #+#             */
-/*   Updated: 2025/11/25 10:45:25 by asauvage         ###   ########.fr       */
+/*   Updated: 2025/11/25 13:36:30 by asauvage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,10 @@
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 2
 
+# endif
+
+# ifndef FD_MAX
+#  define FD_MAX 4096
 # endif
 
 # include <fcntl.h>
