@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: asauvage <asauvage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/11/20 14:04:19 by asauvage          #+#    #+#             */
-/*   Updated: 2025/11/25 10:44:58 by asauvage         ###   ########.fr       */
+/*   Created: 2025/11/25 10:40:32 by asauvage          #+#    #+#             */
+/*   Updated: 2025/11/25 10:46:17 by asauvage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*result_line(char *stash)
 {
@@ -132,7 +132,7 @@ char	*get_next_line(int fd)
 	stash = clean_stash(stash);
 	return (res);
 }
-/* 
+/*
 int	main(void)
 {
 	char *res;
