@@ -6,7 +6,7 @@
 /*   By: asauvage <asauvage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/25 10:44:25 by asauvage          #+#    #+#             */
-/*   Updated: 2025/11/26 10:17:49 by asauvage         ###   ########.fr       */
+/*   Updated: 2025/11/26 14:10:18 by asauvage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,6 @@
 #  define FD_MAX 1024
 # endif
 
-# include <fcntl.h>
-# include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
 
