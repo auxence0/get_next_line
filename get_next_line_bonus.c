@@ -6,7 +6,7 @@
 /*   By: asauvage <asauvage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/25 10:40:32 by asauvage          #+#    #+#             */
-/*   Updated: 2025/11/25 13:43:02 by asauvage         ###   ########.fr       */
+/*   Updated: 2025/11/26 13:56:24 by asauvage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,12 +43,11 @@ char	*ft_join(char *stash, char *buff)
 	int		j;
 	char	*res;
 
-	if (!buff)
-		return (0);
 	res = malloc(sizeof(char) * (ft_strlen(stash) + ft_strlen(buff) + 1));
 	if (!res)
 	{
-		free(stash);
+		if (stash)
+			free(stash);
 		return (0);
 	}
 	i = 0;

@@ -6,7 +6,7 @@
 /*   By: asauvage <asauvage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/20 14:04:19 by asauvage          #+#    #+#             */
-/*   Updated: 2025/11/25 10:44:58 by asauvage         ###   ########.fr       */
+/*   Updated: 2025/11/26 13:54:08 by asauvage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,12 +43,11 @@ char	*ft_join(char *stash, char *buff)
 	int		j;
 	char	*res;
 
-	if (!buff)
-		return (0);
 	res = malloc(sizeof(char) * (ft_strlen(stash) + ft_strlen(buff) + 1));
 	if (!res)
 	{
-		free(stash);
+		if (stash)
+			free(stash);
 		return (0);
 	}
 	i = 0;
@@ -91,7 +90,7 @@ char	*clean_stash(char *stash)
 
 char	*search_line(int fd, char *buff, char *stash, ssize_t bytes)
 {
-	while (bytes > 0 && (!stash || find_n(stash) == 1))
+	while (bytes > 0 && find_n(stash) == 1)
 	{
 		bytes = read(fd, buff, BUFFER_SIZE);
 		if (bytes == -1)
